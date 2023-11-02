@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>KHMER WEDDING</title>
+  <style>
+    #search-bar {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      color: white;
+    }
+
+    #results {
+      margin-top: 10px;
+    }
+
+    #results table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid gold;
+    }
+
+    #results th,
+    #results td {
+      padding: 5px;
+      border: 2px solid gold;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+
+    body {
+      background-image: url(bg.png);
+      background-size: cover;
+      background-position: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <span
+    style="color: gold; display: block; text-align: center;padding: 5px; margin-block-end: 0.83em; margin-block-start: 0.83em;font-weight: 600;font-size: 36px;font-family: 'Noto Sans Khmer', sans-serif;">សៀវភៅកត់កំណង់ដៃ</span>
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="ស្វែងរក...">
+    <button onclick="search()">ស្វែងរក</button>
+    <button onclick="clearSearch()">សម្អាត</button>
+  </div>
+  <div id="results"></div>
+
+  <script>
+    var data = []; // Variable to store the fetched data
+
+    function fetchAndDisplayData() {
+      var url = 'https://api.sheety.co/637dfb38751b8d45cf08ca224f82311e/weendingCode/sheet1';
+
+      fetch(url)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (responseData) {
+          data = responseData.sheet1; // Store the fetched data
+          displayResults(data);
+        })
+        .catch(function (error) {
+          console.log('Error:', error);
+        });
+    }
+
+    function search() {
+      var keyword = document.getElementById('search-input').value;
+      var filteredData = data.filter(function (item) {
+        for (var key in item) {
+          if (item.hasOwnProperty(key) && item[key].toString().toLowerCase().includes(keyword.toLowerCase())) {
+            return true;
+          }
+        }
+        return false;
+      });
+      displayResults(filteredData);
+    }
+
+    function displayResults(data) {
+  var resultsContainer = document.getElementById('results');
+  resultsContainer.innerHTML = '';
+
+  if (data.length > 0) {
+    var table = document.createElement('table');
+    var headerRow = document.createElement('tr');
+    var headers = Object.keys(data[0]);
+
+    headers.forEach(function (header) {
+      if (header !== 'id') { // Exclude the 'id' column
+        var th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+      }
+    });
+
+    table.appendChild(headerRow);
+
+    data.forEach(function (item) {
+      var row = document.createElement('tr');
+
+      headers.forEach(function (header) {
+        if (header !== 'id') { // Exclude the 'id' column
+          var cell = document.createElement('td');
+
+          if (header === 'ប្រាក់រៀល') { // Format currency value
+            cell.textContent = item[header] ? item[header] + ' ៛' : ''; // Append ' រៀល' to the value if it exists
+          } else if (header === 'ប្រាក់ដុល្លា') {
+            // Format currency value
+            cell.textContent = item[header] ? item[header] + ' $' : ''; // Append ' ដុល្លា' to the value if it exists
+          } else {
+            cell.textContent = item[header] || ''; // Display the value if it exists, otherwise display empty space
+          }
+
+          row.appendChild(cell);
+        }
+      });
+
+      table.appendChild(row);
+    });
+
+    resultsContainer.appendChild(table);
+  } else {
+    resultsContainer.textContent = 'មិនមានទិន្នន័យនោះទេ!';
+  }
+}
+
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      displayResults(data); // Display all data when the search is cleared
+    }
+
+    // Fetch and display data when the page loads
+    fetchAndDisplayData();
+  </script>
+</body>
+
+</html>
