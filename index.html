@@ -4,177 +4,231 @@
 <head>
     <title>សៀវភៅកត់ចំណងដៃ</title>
     <link rel="icon" href="icon.png">
-  <style>
-    #search-bar {
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: center;
-      color: white;
-    }
+    <style>
+        #search-bar {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            color: white;
+        }
 
-    #results {
-      margin-top: 10px;
-    }
+        #results {
+            margin-top: 10px;
+        }
 
-    #results table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 2px solid gold;
-    }
+        #results table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid gold;
+        }
 
-    #results th,
-    #results td {
-      padding: 5px;
-      border: 2px solid gold;
-      justify-content: center;
-      color: white;
-      text-align: center;
-    }
+        #results th,
+        #results td {
+            padding: 5px;
+            border: 2px solid gold;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
 
-    body {
-      background-image: url(bg.png);
-      background-size: cover;
-      background-position: cover;
-    }
+        body {
+            background-image: url(bg.png);
+            background-size: cover;
+            background-position: cover;
+        }
 
-    #welcome-container {
+        #welcome-container {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
             height: 100%;
             background: #ff1c1c;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             z-index: 1000;
-            animation: fadeIn 1s ease-out; /* Add the animation property */
+            animation: fadeIn 1s ease-out;
         }
 
-        #welcome-image {
-            max-width: 50%;
-            max-height: 50%;
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* Prevent scrolling while the popup is displayed */
         }
 
-        /* Add the animation keyframes */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.5);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        #welcome-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        /* Initial scale to start from a smaller size */
+        background: #ff1c1c;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: popUp 1s ease-out forwards;
+        /* Animation for popping up */
+    }
+
+    #welcome-text {
+        color: gold;
+        padding: 5px;
+        font-weight: 600;
+        font-size: 36px;
+        font-family: 'Noto Sans Khmer', sans-serif;
+        margin-top: 20px;
+        position: relative;
+        animation: rgbGlow 2s linear infinite;
+    }
+
+    #welcome-image {
+        max-width: 50%;
+        max-height: 50%;
+    }
+
+    /* Add the animation keyframes */
+    @keyframes popUp {
+        from {
+            transform: translate(-50%, -50%) scale(0.5);
         }
 
-  </style>
+        to {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    /* Define the keyframes for the RGB glow */
+    @keyframes rgbGlow {
+        0% {
+            text-shadow: 0 0 10px red, 0 0 20px yellow, 0 0 30px green;
+        }
+        25% {
+            text-shadow: 0 0 30px red, 0 0 20px yellow, 0 0 10px green;
+        }
+        50% {
+            text-shadow: 0 0 10px red, 0 0 20px yellow, 0 0 30px green;
+        }
+        75% {
+            text-shadow: 0 0 30px red, 0 0 20px yellow, 0 0 10px green;
+        }
+        100% {
+            text-shadow: 0 0 10px red, 0 0 20px yellow, 0 0 30px green;
+        }
+    }
+    </style>
 </head>
 
 <body>
     <!-- Welcome container -->
     <div id="welcome-container">
-      <img id="welcome-image" src="2.png" alt="Welcome Image">
-  </div>
+        <span id="welcome-text">ចំណងអាពាហ៍ពិពាហ៍</span>
+        <img id="welcome-image" src="2.png" alt="Welcome Image">
+    </div>
 
-  <span style="color: gold; display: block; text-align: center; padding: 5px; margin-block-end: 0.83em; margin-block-start: 0.83em; font-weight: 600; font-size: 36px; font-family: 'Noto Sans Khmer', sans-serif;">សៀវភៅកត់កំណង់ដៃ</span>
-  <div id="search-bar">
-      <input type="text" id="search-input" placeholder="ស្វែងរក...">
-      <button onclick="search()">ស្វែងរក</button>
-      <button onclick="clearSearch()">សម្អាត</button>
-  </div>
-  <div id="results"></div>
+    <span
+        style="color: gold; display: block; text-align: center; padding: 5px; margin-block-end: 0.83em; margin-block-start: 0.83em; font-weight: 600; font-size: 36px; font-family: 'Noto Sans Khmer', sans-serif;">សៀវភៅកត់កំណង់ដៃ</span>
+    <div id="search-bar">
+        <input type="text" id="search-input" placeholder="ស្វែងរក...">
+        <button onclick="search()">ស្វែងរក</button>
+        <button onclick="clearSearch()">សម្អាត</button>
+    </div>
+    <div id="results"></div>
 
-  <script>
-      var data = []; // Variable to store the fetched data
+    <script>
+        var data = []; // Variable to store the fetched data
 
-      function fetchAndDisplayData() {
-          var url = 'https://script.google.com/macros/s/AKfycbwtiH19A3cJ70AykfbFg_KOgzq9LRjG3QvMTAKluG4Q1VpoAy85OwXmKYshSRn9KLbiJQ/exec';
+        function fetchAndDisplayData() {
+            var url = 'https://script.google.com/macros/s/AKfycbwtiH19A3cJ70AykfbFg_KOgzq9LRjG3QvMTAKluG4Q1VpoAy85OwXmKYshSRn9KLbiJQ/exec';
 
-          fetch(url)
-              .then(function (response) {
-                  return response.json();
-              })
-              .then(function (responseData) {
-                  data = responseData.sheet1; // Store the fetched data
-                  displayResults(data);
-              })
-              .catch(function (error) {
-                  console.log('Error:', error);
-              });
-      }
+            fetch(url)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (responseData) {
+                    data = responseData.sheet1; // Store the fetched data
+                    displayResults(data);
+                })
+                .catch(function (error) {
+                    console.log('Error:', error);
+                });
+        }
 
-      function search() {
-          var keyword = document.getElementById('search-input').value;
-          var filteredData = data.filter(function (item) {
-              for (var key in item) {
-                  if (item.hasOwnProperty(key) && item[key].toString().toLowerCase().includes(keyword.toLowerCase())) {
-                      return true;
-                  }
-              }
-              return false;
-          });
-          displayResults(filteredData);
-      }
+        function search() {
+            var keyword = document.getElementById('search-input').value;
+            var filteredData = data.filter(function (item) {
+                for (var key in item) {
+                    if (item.hasOwnProperty(key) && item[key].toString().toLowerCase().includes(keyword.toLowerCase())) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            displayResults(filteredData);
+        }
 
-      function displayResults(data) {
-          var resultsContainer = document.getElementById('results');
-          resultsContainer.innerHTML = '';
+        function displayResults(data) {
+            var resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
 
-          if (data.length > 0) {
-              var table = document.createElement('table');
-              var headerRow = document.createElement('tr');
-              var headers = Object.keys(data[0]);
+            if (data.length > 0) {
+                var table = document.createElement('table');
+                var headerRow = document.createElement('tr');
+                var headers = Object.keys(data[0]);
 
-              headers.forEach(function (header) {
-                  if (header !== 'id') { // Exclude the 'id' column
-                      var th = document.createElement('th');
-                      th.textContent = header;
-                      headerRow.appendChild(th);
-                  }
-              });
+                headers.forEach(function (header) {
+                    if (header !== 'id') { // Exclude the 'id' column
+                        var th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    }
+                });
 
-              table.appendChild(headerRow);
+                table.appendChild(headerRow);
 
-              data.forEach(function (item) {
-                  var row = document.createElement('tr');
+                data.forEach(function (item) {
+                    var row = document.createElement('tr');
 
-                  headers.forEach(function (header) {
-                      if (header !== 'id') { // Exclude the 'id' column
-                          var cell = document.createElement('td');
+                    headers.forEach(function (header) {
+                        if (header !== 'id') { // Exclude the 'id' column
+                            var cell = document.createElement('td');
 
-                          if (header === 'ប្រាក់រៀល') { // Format currency value
-                              cell.textContent = item[header] ? item[header] + ' ៛' : ''; // Append ' រៀល' to the value if it exists
-                          } else if (header === 'ប្រាក់ដុល្លា') {
-                              // Format currency value
-                              cell.textContent = item[header] ? item[header] + ' $' : ''; // Append ' ដុល្លា' to the value if it exists
-                          } else {
-                              cell.textContent = item[header] || ''; // Display the value if it exists, otherwise display empty space
-                          }
+                            if (header === 'ប្រាក់រៀល') { // Format currency value
+                                cell.textContent = item[header] ? item[header] + ' ៛' : ''; // Append ' រៀល' to the value if it exists
+                            } else if (header === 'ប្រាក់ដុល្លា') {
+                                // Format currency value
+                                cell.textContent = item[header] ? item[header] + ' $' : ''; // Append ' ដុល្លា' to the value if it exists
+                            } else {
+                                cell.textContent = item[header] || ''; // Display the value if it exists, otherwise display empty space
+                            }
 
-                          row.appendChild(cell);
-                      }
-                  });
+                            row.appendChild(cell);
+                        }
+                    });
 
-                  table.appendChild(row);
-              });
+                    table.appendChild(row);
+                });
 
-              resultsContainer.appendChild(table);
-          } else {
-              resultsContainer.textContent = 'មិនមានទិន្នន័យនោះទេ!';
-          }
-      }
+                resultsContainer.appendChild(table);
+            } else {
+                resultsContainer.textContent = 'មិនមានទិន្នន័យនោះទេ!';
+            }
+        }
 
-      function clearSearch() {
-      document.getElementById('search-input').value = '';
-      displayResults(data); // Display all data when the search is cleared
-    }
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            displayResults(data); // Display all data when the search is cleared
+        }
 
-    // Fetch and display data when the page loads
-    fetchAndDisplayData();
+        // Fetch and display data when the page loads
+        fetchAndDisplayData();
 
-      // Function to hide the welcome container after 5 seconds
-      function hideWelcome() {
+        // Function to hide the welcome container after 5 seconds
+        function hideWelcome() {
             var welcomeContainer = document.getElementById('welcome-container');
             welcomeContainer.style.display = 'none';
         }
@@ -186,7 +240,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             setTimeout(hideWelcome, 5000); // 5000 milliseconds (5 seconds)
         });
-  </script>
+    </script>
 </body>
 
 </html>
